@@ -6,9 +6,10 @@ const unhandledRejection = () => {
     console.log(err.name, err.message);
     const now = new Date(Date.now());
     fs.appendFileSync("./log.txt", `${now.toUTCString()} - ${err}\n`, "utf-8");
-    server.close(() => {
-      process.exit(1);
-    });
+    // server.close(() => {
+    //   process.exit(1);
+    // });
+    process.exit(1);
   });
 };
 

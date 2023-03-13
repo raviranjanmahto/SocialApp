@@ -6,6 +6,11 @@ const express = require("express");
 const mongoose = require("mongoose");
 const morgan = require("morgan");
 const unhandledRejection = require("./helpers/unhandledRejection");
+const helmet = require("helmet");
+const cors = require("cors");
+const userRouter = require("./routes/userRoutes");
+const globalErrorHandler = require("./middlewares/errorMiddleware");
+const AppError = require("./utils/appError");
 
 const app = express();
 app.use(express.json());
@@ -14,10 +19,26 @@ app.use(express.json());
 // Set security HTTP headers
 app.use(helmet());
 
+app.use(cors());
+
 // Development logging
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
+
+// Test middleware
+app.use((req, res, next) => {
+  console.log("Hello from the middleware🥰");
+  next();
+});
+
+app.use("/api/v1/users", userRouter);
+
+app.all("*", (req, res, next) => {
+  next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
+});
+
+app.use(globalErrorHandler);
 
 const port = process.env.PORT || 7000;
 

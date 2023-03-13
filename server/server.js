@@ -1,8 +1,23 @@
 const dotenv = require("dotenv").config();
+const uncaughtException = require("./helpers/uncaughtException");
+// HANDLING UNCAUGHT EXCEPTION ERROR ON TOP
+uncaughtException();
 const express = require("express");
 const mongoose = require("mongoose");
+const morgan = require("morgan");
+const unhandledRejection = require("./helpers/unhandledRejection");
 
 const app = express();
+app.use(express.json());
+
+// 1) GLOBAL MIDDLEWARES
+// Set security HTTP headers
+app.use(helmet());
+
+// Development logging
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
+}
 
 const port = process.env.PORT || 7000;
 
@@ -15,3 +30,6 @@ mongoose
     )
   )
   .catch(err => console.log(`Error 🙄💥💥🙄 read message =>`, err.message));
+
+// TO HANDLE UNHANDLED REJECTION ERROR
+unhandledRejection();

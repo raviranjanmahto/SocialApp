@@ -1,6 +1,6 @@
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
-const catchTry = require("../utils/catchTry");
+const catchAsync = require("../utils/catchAsync");
 const AppError = require("../../../Natours/utils/appError");
 
 const signToken = id => {
@@ -23,7 +23,7 @@ const createSendToken = (user, statusCode, res) => {
   res.status(statusCode).json({ status: "success", token, data: user });
 };
 
-exports.signup = catchTry(async (req, res, next) => {
+exports.signup = catchAsync(async (req, res, next) => {
   const {
     firstName,
     lastName,
@@ -49,7 +49,7 @@ exports.signup = catchTry(async (req, res, next) => {
   createSendToken(newUser, 201, res);
 });
 
-exports.login = catchTry(async (req, res, next) => {
+exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email }).select("+password");
   if (!user || !(await user.correctPassword(password, user.password)))
@@ -58,7 +58,7 @@ exports.login = catchTry(async (req, res, next) => {
   createSendToken(user, 200, res);
 });
 
-exports.protect = catchTry(async (req, res, next) => {
+exports.protect = catchAsync(async (req, res, next) => {
   // 1) Getting token and check of it's there
   let token;
   if (
@@ -73,7 +73,7 @@ exports.protect = catchTry(async (req, res, next) => {
     );
 
   // 2) Validate token
-  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
   // 3) Check if user still exists
   const currentUser = await User.findById(decoded.id);

@@ -1,11 +1,7 @@
 const dotenv = require("dotenv").config();
-const uncaughtException = require("./helpers/uncaughtException");
-// HANDLING UNCAUGHT EXCEPTION ERROR ON TOP
-uncaughtException();
 const express = require("express");
 const mongoose = require("mongoose");
 const morgan = require("morgan");
-const unhandledRejection = require("./helpers/unhandledRejection");
 const helmet = require("helmet");
 const cors = require("cors");
 const userRouter = require("./routes/userRoutes");
@@ -22,9 +18,7 @@ app.use(helmet());
 app.use(cors());
 
 // Development logging
-if (process.env.NODE_ENV === "development") {
-  app.use(morgan("dev"));
-}
+if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
 
 // Test middleware
 app.use((req, res, next) => {
@@ -52,5 +46,3 @@ mongoose
   )
   .catch(err => console.log(`Error 🙄💥💥🙄 read message =>`, err.message));
 
-// TO HANDLE UNHANDLED REJECTION ERROR
-unhandledRejection();
